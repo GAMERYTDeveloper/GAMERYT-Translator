@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAMERYT Translator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        .nav-text {
+            transition: opacity 0.3s ease, max-width 0.3s ease;
+        }
+        .nav-item-collapsed .nav-text {
+            opacity: 0;
+            max-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            font-size: 17px;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.5s linear;
+        }
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .nav-item {
+            cursor: pointer;
+        }
+        /* Hides the logo text on small screens */
+        @media (max-width: 430px) {
+            .logo-text {
+                display: none;
+            }
+        }
+        /* Large Text Mode Styles */
+        body.large-text-enabled {
+            font-size: 1.125rem; /* Equivalent to text-lg */
+        }
+        body.large-text-enabled textarea,
+        body.large-text-enabled #to-text,
+        body.large-text-enabled input,
+        body.large-text-enabled pre,
+        body.large-text-enabled select,
+        body.large-text-enabled button {
+            font-size: 1.125rem;
+        }
+        body.large-text-enabled .text-2xl {
+             font-size: 1.875rem;
+        }
+        body.large-text-enabled .text-sm {
+             font-size: 1rem; /* Adjust smaller texts */
+        }
+        /* Fix for document text wrapping */
+        pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        /* Custom styling for dropdowns */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        html.dark select {
+             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='white' class='w-6 h-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9' /%3E%3C/svg%3E");
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        purple: {
+                            '50': '#faf5ff',
+                            '100': '#f3e8ff',
+                            '200': '#e9d5ff',
+                            '300': '#d8b4fe',
+                            '400': '#c084fc',
+                            '500': '#a855f7',
+                            '600': '#9333ea',
+                            '700': '#7e22ce',
+                            '800': '#6b21a8',
+                            '900': '#581c87',
+                            '950': '#3b0764',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans transition-colors duration-300">
+
+    <div id="app-container" class="flex flex-col h-screen">
+
+        <!-- Topbar -->
+        <header class="bg-white dark:bg-gray-800 shadow-md z-40">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center justify-between h-16">
+                    <!-- Left: Logo & Menu Icon -->
+                    <div class="flex items-center space-x-4">
+                        <button id="menu-icon" class="hidden p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+                        </button>
+                        <div class="flex items-center">
+                            <img src="https://i.imgur.com/Sck1YjR.png" alt="Logo" class="h-8 w-8 rounded-full">
+                            <span class="logo-text ml-2 text-xl font-bold">GAMERYT Translator</span>
+                        </div>
+                    </div>
+
+                    <!-- Middle: Nav Bar -->
+                    <nav id="nav-bar" class="flex-grow flex items-center justify-center">
+                        <ul class="flex items-center space-x-2">
+                            <li><a id="nav-translate" class="nav-item flex items-center px-4 py-2 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C13.18 7.061 14.1 10.032 14.99 13.5m2.1-6.542a48.342 48.342 0 01-5.23 4.49L6.63 19.5m12.254-13.87a48.488 48.488 0 00-5.23-4.49" /></svg>
+                                <span class="nav-text ml-2">Translate</span>
+                            </a></li>
+                            <li><a id="nav-history" class="nav-item flex items-center px-4 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <span class="nav-text ml-2">History</span>
+                            </a></li>
+                            <li><a id="nav-settings" class="nav-item flex items-center px-4 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.438.995s.145.755.438.995l1.003.827c.48.398.668 1.03.26 1.431l-1.296 2.247a1.125 1.125 0 01-1.37.49l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.063-.374-.313-.686-.645-.87a6.52 6.52 0 01-.22-.127c-.324-.196-.72-.257-1.075-.124l-1.217.456a1.125 1.125 0 01-1.37-.49l-1.296-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.437-.995s-.145-.755-.437-.995l-1.004-.827a1.125 1.125 0 01-.26-1.431l1.296-2.247a1.125 1.125 0 011.37-.49l1.217.456c.355.133.75.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                <span class="nav-text ml-2">Settings</span>
+                            </a></li>
+                        </ul>
+                    </nav>
+
+                    <!-- Right: Icons -->
+                    <div class="flex items-center space-x-2">
+                        <div class="relative">
+                            <button id="apps-button" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+                            </button>
+                            <div id="apps-menu" class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700">
+                                <div class="p-4 grid grid-cols-3 gap-4">
+                                    <a href="https://gamerytdeveloper.github.io/GAMERYT-Calculator/app/app.html" target="_blank" class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <svg class="h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 3h.008v.008H8.25v-.008zm0 3h.008v.008H8.25v-.008zm3-6h.008v.008H11.25v-.008zm0 3h.008v.008H11.25v-.008zm0 3h.008v.008H11.25v-.008zm3-6h.008v.008H14.25v-.008zm0 3h.008v.008H14.25v-.008zM6 6h12v12H6V6z" /></svg>
+                                        <span class="text-xs mt-1 text-center">GAMERYT Calculator</span>
+                                    </a>
+                                    <a href="https://gamerytdeveloper.github.io/GAMERYT-Docs/index.html?lang=en" target="_blank" class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <svg class="h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                                        <span class="text-xs mt-1 text-center">GAMERYT Docs</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button id="help-button" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>
+                            </button>
+                            <div id="help-menu" class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-4">
+                                <a href="https://mail.google.com/mail/u/0/?fs=1&tf=cm&source=mailto&to=minecraftgamer97529@gmail.com" target="_blank" class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <svg class="h-6 w-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                                    <span>Contact</span>
+                                </a>
+                                <div class="mt-4">
+                                    <h3 class="font-semibold mb-2">Help Topics</h3>
+                                    <ul id="help-topics-list" class="space-y-1 text-sm">
+                                        <li><a data-topic="translate" class="cursor-pointer block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Learning to translate</a></li>
+                                        <li><a data-topic="history" class="cursor-pointer block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Explaining history</a></li>
+                                        <li><a data-topic="settings" class="cursor-pointer block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Explaining settings</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Mobile Sidebar -->
+        <div id="mobile-sidebar" class="fixed inset-0 bg-gray-800 bg-opacity-75 z-50 hidden">
+            <div class="w-64 bg-white dark:bg-gray-800 h-full shadow-lg p-4">
+                <button id="close-sidebar" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                <nav id="mobile-nav-links" class="mt-10">
+                    <ul class="flex flex-col space-y-2">
+                         <li><a data-nav="translate" class="flex items-center px-4 py-2 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C13.18 7.061 14.1 10.032 14.99 13.5m2.1-6.542a48.342 48.342 0 01-5.23 4.49L6.63 19.5m12.254-13.87a48.488 48.488 0 00-5.23-4.49" /></svg>
+                            <span class="ml-4">Translate</span>
+                        </a></li>
+                        <li><a data-nav="history" class="flex items-center px-4 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span class="ml-4">History</span>
+                        </a></li>
+                        <li><a data-nav="settings" class="flex items-center px-4 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.438.995s.145.755.438.995l1.003.827c.48.398.668 1.03.26 1.431l-1.296 2.247a1.125 1.125 0 01-1.37.49l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.063-.374-.313-.686-.645-.87a6.52 6.52 0 01-.22-.127c-.324-.196-.72-.257-1.075-.124l-1.217.456a1.125 1.125 0 01-1.37-.49l-1.296-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.437-.995s-.145-.755-.437-.995l-1.004-.827a1.125 1.125 0 01-.26-1.431l1.296-2.247a1.125 1.125 0 011.37-.49l1.217.456c.355.133.75.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <span class="ml-4">Settings</span>
+                        </a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto p-4 overflow-y-auto">
+            <!-- Translate View -->
+            <div id="translate-view">
+                <div id="translation-container" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col">
+                        <div class="flex items-center justify-between mb-2">
+                             <select id="from-lang" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 font-semibold"></select>
+                        </div>
+                        <textarea id="from-text" class="flex-grow w-full bg-transparent p-2 text-2xl focus:outline-none resize-none" placeholder="Enter text"></textarea>
+                        <div class="flex items-center justify-between mt-2">
+                            <div class="space-x-1">
+                                <button id="speak-from" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
+                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                                </button>
+                            </div>
+                            <button id="copy-from" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col">
+                         <div class="flex items-center justify-between mb-2">
+                             <select id="to-lang" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 font-semibold"></select>
+                        </div>
+                        <div id="to-text-container" class="flex-grow w-full p-2 text-2xl relative">
+                            <p id="to-text" class="text-gray-500 dark:text-gray-400">Translation</p>
+                            <div id="loading-spinner" class="hidden absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-50 flex items-center justify-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-2">
+                             <button id="speak-to" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                             </button>
+                             <button id="copy-to" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
+                             </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History View -->
+            <div id="history-view" class="hidden">
+                 <h2 class="text-2xl font-bold mb-4">Translation History</h2>
+                 <div class="mb-4">
+                    <input type="text" id="history-search" class="w-full p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="Search history...">
+                 </div>
+                 <div id="history-list" class="space-y-4">
+                    <!-- History items will be injected here -->
+                 </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="hidden">
+                <h2 class="text-2xl font-bold mb-4">Settings</h2>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-medium">Dark Mode</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Toggle between light and dark themes.</p>
+                        </div>
+                        <button id="dark-mode-toggle" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors bg-gray-200 dark:bg-gray-600">
+                            <span class="sr-only">Enable dark mode</span>
+                            <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform translate-x-1 dark:translate-x-6"></span>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-medium">Large Text</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Increase the text size for better readability.</p>
+                        </div>
+                        <button id="large-text-toggle" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors bg-gray-200">
+                            <span class="sr-only">Enable large text</span>
+                            <span class="toggle-dot inline-block w-4 h-4 transform bg-white rounded-full transition-transform translate-x-1"></span>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-medium">Temporary Mode</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Translations will not be saved to history.</p>
+                        </div>
+                        <button id="temp-mode-toggle" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors bg-gray-200">
+                            <span class="sr-only">Enable temporary mode</span>
+                            <span class="toggle-dot inline-block w-4 h-4 transform bg-white rounded-full transition-transform translate-x-1"></span>
+                        </button>
+                    </div>
+                </div>
+                 <div class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <p>Made by GAMERYT97529</p>
+                    <p>Creator: GAMERYTDeveloper</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-full overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="help-modal-title" class="text-2xl font-bold"></h2>
+                    <button id="close-help-modal" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                <div id="help-modal-content" class="prose dark:prose-invert max-w-none">
+                    <!-- Help content goes here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- ELEMENTS ---
+            const body = document.body;
+            const navBar = document.getElementById('nav-bar');
+            const navItems = document.querySelectorAll('.nav-item');
+            const menuIcon = document.getElementById('menu-icon');
+            const mobileSidebar = document.getElementById('mobile-sidebar');
+            const closeSidebar = document.getElementById('close-sidebar');
+
+            const appsButton = document.getElementById('apps-button');
+            const appsMenu = document.getElementById('apps-menu');
+            const helpButton = document.getElementById('help-button');
+            const helpMenu = document.getElementById('help-menu');
+
+            const fromLang = document.getElementById('from-lang');
+            const toLang = document.getElementById('to-lang');
+            const fromText = document.getElementById('from-text');
+            const toText = document.getElementById('to-text');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            
+            const speakFromBtn = document.getElementById('speak-from');
+            const speakToBtn = document.getElementById('speak-to');
+            const copyFromBtn = document.getElementById('copy-from');
+            const copyToBtn = document.getElementById('copy-to');
+
+            const toast = document.getElementById('toast');
+
+            // Views
+            const translateView = document.getElementById('translate-view');
+            const historyView = document.getElementById('history-view');
+            const settingsView = document.getElementById('settings-view');
+            const navLinks = {
+                translate: document.getElementById('nav-translate'),
+                history: document.getElementById('nav-history'),
+                settings: document.getElementById('nav-settings'),
+            };
+            const mobileNavLinks = document.getElementById('mobile-nav-links');
+
+            // History
+            const historyList = document.getElementById('history-list');
+            const historySearch = document.getElementById('history-search');
+
+            // Settings
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const largeTextToggle = document.getElementById('large-text-toggle');
+            const tempModeToggle = document.getElementById('temp-mode-toggle');
+
+            // Help Modal
+            const helpModal = document.getElementById('help-modal');
+            const helpModalTitle = document.getElementById('help-modal-title');
+            const helpModalContent = document.getElementById('help-modal-content');
+            const closeHelpModal = document.getElementById('close-help-modal');
+            const helpTopicsList = document.getElementById('help-topics-list');
+
+            // --- STATE ---
+            let state = {
+                darkMode: true,
+                largeText: false,
+                tempMode: false,
+                history: [],
+            };
+            let synthesis = window.speechSynthesis;
+
+            // --- DATA ---
+            const languages = {
+                "en": "English", "es": "Spanish", "fr": "French", "de": "German",
+                "it": "Italian", "ja": "Japanese", "ko": "Korean", "pt": "Portuguese",
+                "ru": "Russian", "zh-CN": "Chinese", "ar": "Arabic", "hi": "Hindi",
+                "bn": "Bengali", "el": "Greek", "nl": "Dutch", "sv": "Swedish", "tr": "Turkish"
+            };
+
+            const helpArticles = {
+                translate: {
+                    title: "Learning to Translate",
+                    content: `<p>Translating text is easy! Here's how:</p>
+                              <ol>
+                                <li><strong>Enter Text:</strong> Type the text you want to translate into the left-hand box.</li>
+                                <li><strong>Select Languages:</strong> Use the dropdown menus to select the original language and the language you want to translate it into.</li>
+                                <li><strong>View Translation:</strong> The translated text will appear automatically in the right-hand box as you type.</li>
+                                <li><strong>Listen Aloud:</strong> Click the speaker icon to hear the original or translated text read aloud.</li>
+                              </ol>`
+                },
+                history: {
+                    title: "Explaining History",
+                    content: `<p>The app keeps a record of your translations for you.</p>
+                              <ul>
+                                <li><strong>Automatic Saving:</strong> Every translation you make is automatically saved to your history.</li>
+                                <li><strong>Viewing History:</strong> Click on the 'History' tab in the navigation bar to see a list of all your past translations.</li>
+                                <li><strong>Searching:</strong> Use the search bar at the top of the History page to quickly find specific translations.</li>
+                                <li><strong>Temporary Mode:</strong> If you don't want your translations to be saved, go to 'Settings' and enable 'Temporary Mode'.</li>
+                              </ul>`
+                },
+                settings: {
+                    title: "Explaining Settings",
+                    content: `<p>Customize your experience on the 'Settings' page.</p>
+                              <ul>
+                                <li><strong>Dark Mode:</strong> Prefer a darker theme? Use the toggle to switch between light and dark modes.</li>
+                                <li><strong>Large Text:</strong> For better readability, enable this option to increase the font size across the app.</li>
+                                <li><strong>Temporary Mode:</strong> When enabled, your translations will not be saved to your history. This is useful for one-off translations you don't need to remember.</li>
+                              </ul>`
+                }
+            };
+
+            // --- INITIALIZATION ---
+            const init = () => {
+                loadState();
+                applySettings();
+                populateLanguages();
+                setupEventListeners();
+                handleResize();
+                loadHistory();
+                showView('translate');
+            };
+
+            // --- SETTINGS & STATE MANAGEMENT ---
+            const loadState = () => {
+                try {
+                    const savedState = JSON.parse(localStorage.getItem('gamerytTranslatorState'));
+                    if (savedState) {
+                        state = { ...state, ...savedState };
+                    }
+                } catch (e) { console.error("Could not load state from localStorage", e); }
+            };
+
+            const saveState = () => {
+                try {
+                    localStorage.setItem('gamerytTranslatorState', JSON.stringify(state));
+                } catch (e) { console.error("Could not save state to localStorage", e); }
+            };
+
+            const applySettings = () => {
+                document.documentElement.classList.toggle('dark', state.darkMode);
+                darkModeToggle.classList.toggle('dark:bg-purple-600', state.darkMode);
+                darkModeToggle.querySelector('span:last-child').classList.toggle('dark:translate-x-6', state.darkMode);
+                
+                body.classList.toggle('large-text-enabled', state.largeText);
+                largeTextToggle.classList.toggle('bg-purple-500', state.largeText);
+                largeTextToggle.querySelector('.toggle-dot').classList.toggle('translate-x-5', state.largeText);
+
+                tempModeToggle.classList.toggle('bg-purple-500', state.tempMode);
+                tempModeToggle.querySelector('.toggle-dot').classList.toggle('translate-x-5', state.tempMode);
+            };
+            
+            // --- UI & VIEW MANAGEMENT ---
+            const showView = (viewName) => {
+                [translateView, historyView, settingsView].forEach(v => v.classList.add('hidden'));
+                
+                Object.values(navLinks).forEach(link => {
+                    link.classList.remove('bg-purple-100', 'dark:bg-purple-900', 'text-purple-600', 'dark:text-purple-300');
+                    link.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+                });
+                
+                mobileNavLinks.querySelectorAll('a').forEach(link => {
+                    link.classList.remove('bg-purple-100', 'dark:bg-purple-900', 'text-purple-600', 'dark:text-purple-300');
+                    link.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+                });
+
+                const activeView = document.getElementById(`${viewName}-view`);
+                const activeLink = navLinks[viewName];
+                const activeMobileLink = mobileNavLinks.querySelector(`[data-nav="${viewName}"]`);
+
+                if(activeView) activeView.classList.remove('hidden');
+                if(activeLink) {
+                    activeLink.classList.add('bg-purple-100', 'dark:bg-purple-900', 'text-purple-600', 'dark:text-purple-300');
+                    activeLink.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+                }
+                if(activeMobileLink) {
+                    activeMobileLink.classList.add('bg-purple-100', 'dark:bg-purple-900', 'text-purple-600', 'dark:text-purple-300');
+                    activeMobileLink.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+                }
+                mobileSidebar.classList.add('hidden');
+            };
+
+            const showToast = (message) => {
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            };
+
+            // --- RESPONSIVE DESIGN HANDLER ---
+            const handleResize = () => {
+                const width = window.innerWidth;
+                navBar.classList.toggle('hidden', width <= 768);
+                menuIcon.classList.toggle('hidden', width > 768);
+                if (width > 768) mobileSidebar.classList.add('hidden');
+                navItems.forEach(item => item.classList.toggle('nav-item-collapsed', width <= 1190));
+            };
+
+            // --- TRANSLATION API ---
+            const fetchCustomTranslation = async (text, from, to) => {
+                if (!text) return "";
+                const langPair = `${from}|${to}`;
+                const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
+                    const data = await response.json();
+                    return data?.responseData?.translatedText || "Translation not available.";
+                } catch (error) {
+                    console.error('Translation API error:', error);
+                    return "Translation failed.";
+                }
+            };
+
+            // --- TRANSLATION LOGIC ---
+            const populateLanguages = () => {
+                Object.entries(languages).forEach(([code, name]) => {
+                    fromLang.add(new Option(name, code));
+                    toLang.add(new Option(name, code));
+                });
+                fromLang.value = 'en';
+                toLang.value = 'es';
+            };
+            
+            let translateTimeout;
+            const triggerTranslation = () => {
+                clearTimeout(translateTimeout);
+                translateTimeout = setTimeout(async () => {
+                    const text = fromText.value.trim();
+                    if (!text) {
+                        toText.textContent = 'Translation';
+                        toText.classList.add('text-gray-500', 'dark:text-gray-400');
+                        speakToBtn.disabled = true; copyToBtn.disabled = true;
+                        return;
+                    }
+                    toText.classList.remove('text-gray-500', 'dark:text-gray-400');
+                    loadingSpinner.classList.remove('hidden');
+                    toText.textContent = '';
+                    try {
+                        const translatedText = await fetchCustomTranslation(text, fromLang.value, toLang.value);
+                        toText.textContent = translatedText;
+                        speakToBtn.disabled = false; copyToBtn.disabled = false;
+                        if (!state.tempMode) addToHistory(text, translatedText, fromLang.value, toLang.value);
+                    } catch (error) {
+                        toText.textContent = 'Error translating text.';
+                    } finally {
+                        loadingSpinner.classList.add('hidden');
+                    }
+                }, 500);
+            };
+
+            // --- HISTORY LOGIC ---
+            const addToHistory = (original, translated, from, to) => {
+                state.history.unshift({ original, translated, from, to, timestamp: new Date().toISOString() });
+                saveState();
+                if (historyView.offsetParent !== null) renderHistory();
+            };
+            const loadHistory = () => renderHistory();
+            const renderHistory = (filter = '') => {
+                historyList.innerHTML = '';
+                const lcFilter = filter.toLowerCase();
+                const filteredHistory = state.history.filter(item => 
+                    item.original.toLowerCase().includes(lcFilter) || item.translated.toLowerCase().includes(lcFilter)
+                );
+                if (filteredHistory.length === 0) {
+                    historyList.innerHTML = `<div class="text-center text-gray-500 dark:text-gray-400 p-4">No history found.</div>`;
+                    return;
+                }
+                filteredHistory.forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'bg-white dark:bg-gray-800 rounded-lg shadow p-4';
+                    el.innerHTML = `
+                        <div class="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
+                           <span>${languages[item.from] || item.from} &rarr; ${languages[item.to] || item.to}</span>
+                           <span>${new Date(item.timestamp).toLocaleString()}</span>
+                        </div>
+                        <p class="font-semibold">${item.original}</p>
+                        <p>${item.translated}</p>`;
+                    historyList.appendChild(el);
+                });
+            };
+
+            // --- SPEECH LOGIC ---
+            const speakText = (text, lang) => {
+                if (synthesis.speaking) synthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang;
+                utterance.onerror = (event) => showToast(`Speech error: ${event.error}`);
+                synthesis.speak(utterance);
+            };
+
+            // --- HELP MODAL LOGIC ---
+            const openHelpModal = (topic) => {
+                const article = helpArticles[topic];
+                if (article) {
+                    helpModalTitle.textContent = article.title;
+                    helpModalContent.innerHTML = article.content;
+                    helpModal.classList.remove('hidden');
+                }
+            };
+            
+            // --- EVENT LISTENERS ---
+            const setupEventListeners = () => {
+                window.addEventListener('resize', handleResize);
+                appsButton.addEventListener('click', (e) => { e.stopPropagation(); appsMenu.classList.toggle('hidden'); helpMenu.classList.add('hidden'); });
+                helpButton.addEventListener('click', (e) => { e.stopPropagation(); helpMenu.classList.toggle('hidden'); appsMenu.classList.add('hidden'); });
+                document.addEventListener('click', () => { appsMenu.classList.add('hidden'); helpMenu.classList.add('hidden'); });
+                Object.entries(navLinks).forEach(([name, link]) => link.addEventListener('click', (e) => { e.preventDefault(); showView(name); }));
+                mobileNavLinks.addEventListener('click', (e) => {
+                    const link = e.target.closest('a');
+                    if (link?.dataset.nav) { e.preventDefault(); showView(link.dataset.nav); }
+                });
+                menuIcon.addEventListener('click', () => mobileSidebar.classList.remove('hidden'));
+                closeSidebar.addEventListener('click', () => mobileSidebar.classList.add('hidden'));
+                mobileSidebar.addEventListener('click', (e) => { if (e.target === mobileSidebar) mobileSidebar.classList.add('hidden'); });
+                
+                fromText.addEventListener('input', () => {
+                    triggerTranslation();
+                    const hasText = fromText.value.trim().length > 0;
+                    speakFromBtn.disabled = !hasText; copyFromBtn.disabled = !hasText;
+                });
+                fromLang.addEventListener('change', triggerTranslation);
+                toLang.addEventListener('change', triggerTranslation);
+                copyFromBtn.addEventListener('click', () => { navigator.clipboard.writeText(fromText.value).then(() => showToast('Source text copied!')); });
+                copyToBtn.addEventListener('click', () => { navigator.clipboard.writeText(toText.textContent).then(() => showToast('Translated text copied!')); });
+                speakFromBtn.addEventListener('click', () => speakText(fromText.value, fromLang.value));
+                speakToBtn.addEventListener('click', () => speakText(toText.textContent, toLang.value));
+                historySearch.addEventListener('input', () => renderHistory(historySearch.value));
+                navLinks.history.addEventListener('click', () => renderHistory(historySearch.value));
+                darkModeToggle.addEventListener('click', () => { state.darkMode = !state.darkMode; saveState(); applySettings(); });
+                largeTextToggle.addEventListener('click', () => { state.largeText = !state.largeText; saveState(); applySettings(); });
+                tempModeToggle.addEventListener('click', () => { state.tempMode = !state.tempMode; saveState(); applySettings(); });
+                helpTopicsList.addEventListener('click', (e) => {
+                    if (e.target.dataset.topic) { openHelpModal(e.target.dataset.topic); helpMenu.classList.add('hidden'); }
+                });
+                closeHelpModal.addEventListener('click', () => helpModal.classList.add('hidden'));
+                helpModal.addEventListener('click', (e) => { if (e.target === helpModal) helpModal.classList.add('hidden'); });
+            };
+
+            // --- RUN APP ---
+            init();
+        });
+    </script>
+</body>
+</html>
