@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GAMERYT Translator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
@@ -78,10 +78,9 @@
         body.large-text-enabled .text-sm {
              font-size: 1rem; /* Adjust smaller texts */
         }
-        /* Fix for document text wrapping */
-        pre {
-            white-space: pre-wrap;
-            word-break: break-word;
+        /* Hides tab text when icon-only class is applied */
+        .tab-button.icon-only .tab-text {
+            display: none;
         }
         /* Custom styling for dropdowns */
         select {
@@ -176,6 +175,10 @@
                                         <svg class="h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
                                         <span class="text-xs mt-1 text-center">GAMERYT Docs</span>
                                     </a>
+                                    <a href="https://gamerytdeveloper.github.io/GAMERYT-Calendar/" target="_blank" class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <svg class="h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18M12 12.75h.008v.008H12v-.008z" /></svg>
+                                        <span class="text-xs mt-1 text-center">GAMERYT Calendar</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -233,40 +236,86 @@
         <main class="flex-grow container mx-auto p-4 overflow-y-auto">
             <!-- Translate View -->
             <div id="translate-view">
-                <div id="translation-container" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col">
-                        <div class="flex items-center justify-between mb-2">
-                             <select id="from-lang" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 font-semibold"></select>
-                        </div>
-                        <textarea id="from-text" class="flex-grow w-full bg-transparent p-2 text-2xl focus:outline-none resize-none" placeholder="Enter text"></textarea>
-                        <div class="flex items-center justify-between mt-2">
-                            <div class="space-x-1">
-                                <button id="speak-from" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
-                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                <!-- Translator Tabs -->
+                <div id="translator-tabs" class="flex items-center border-b border-gray-200 dark:border-gray-700 mb-4">
+                    <button data-tab="text" class="tab-button flex items-center py-2 px-4 text-purple-600 dark:text-purple-300 border-b-2 border-purple-500">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.092 1.21-.138 2.43-.138 3.662s.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.092-1.21.138-2.43.138-3.662zM12 12V4.5" /></svg>
+                        <span class="tab-text ml-2">Text</span>
+                    </button>
+                    <button data-tab="images" class="tab-button flex items-center py-2 px-4 text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+                        <span class="tab-text ml-2">Images</span>
+                    </button>
+                </div>
+
+                <!-- Text Translation Content -->
+                <div id="text-content" class="tab-content">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col">
+                            <div class="flex items-center justify-between mb-2">
+                                 <select id="from-lang" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 font-semibold"></select>
+                            </div>
+                            <textarea id="from-text" class="flex-grow w-full bg-transparent p-2 text-2xl focus:outline-none resize-none" placeholder="Enter text"></textarea>
+                            <div class="flex items-center justify-between mt-2">
+                                <div class="space-x-1">
+                                    <button id="speak-from" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
+                                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                                    </button>
+                                </div>
+                                <button id="copy-from" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
+                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
                                 </button>
                             </div>
-                            <button id="copy-from" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
-                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
-                            </button>
                         </div>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col">
-                         <div class="flex items-center justify-between mb-2">
-                             <select id="to-lang" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 font-semibold"></select>
-                        </div>
-                        <div id="to-text-container" class="flex-grow w-full p-2 text-2xl relative">
-                            <p id="to-text" class="text-gray-500 dark:text-gray-400">Translation</p>
-                            <div id="loading-spinner" class="hidden absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col">
+                             <div class="flex items-center justify-between mb-2">
+                                 <select id="to-lang" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 font-semibold"></select>
+                            </div>
+                            <div id="to-text-container" class="flex-grow w-full p-2 text-2xl relative">
+                                <p id="to-text" class="text-gray-500 dark:text-gray-400">Translation</p>
+                                <div id="loading-spinner" class="hidden absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-50 flex items-center justify-center">
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                 <button id="speak-to" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
+                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                                 </button>
+                                 <button id="copy-to" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
+                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
+                                 </button>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between mt-2">
-                             <button id="speak-to" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
-                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
-                             </button>
-                             <button id="copy-to" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
-                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
-                             </button>
+                    </div>
+                </div>
+                <!-- Image Translation Content -->
+                <div id="images-content" class="tab-content hidden">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                        <h3 class="text-xl font-semibold mb-4">Image Translation</h3>
+                        <div class="flex items-center justify-center w-full mb-4">
+                            <label for="image-upload" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                                <div id="image-upload-prompt" class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
+                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, or GIF</p>
+                                </div>
+                                <img id="image-preview" src="#" alt="Image Preview" class="hidden h-full w-full object-contain rounded-lg"/>
+                                <input id="image-upload" type="file" class="hidden" accept="image/*" />
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                             <div>
+                                <label for="image-from-lang" class="block mb-2 text-sm font-medium">Translate from:</label>
+                                <select id="image-from-lang" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500"></select>
+                             </div>
+                             <div>
+                                <label for="image-to-lang" class="block mb-2 text-sm font-medium">Translate to:</label>
+                                <select id="image-to-lang" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500"></select>
+                             </div>
+                        </div>
+                        <button id="translate-image-btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-4 rounded-lg disabled:opacity-50" disabled>Translate</button>
+                        <div id="image-result-container" class="mt-4 w-full bg-gray-50 dark:bg-gray-700 rounded-lg p-4 min-h-[100px] border border-gray-200 dark:border-gray-600">
+                            <p id="image-result-text" class="text-gray-500 dark:text-gray-400">Translated text will appear here...</p>
                         </div>
                     </div>
                 </div>
@@ -386,6 +435,20 @@
             };
             const mobileNavLinks = document.getElementById('mobile-nav-links');
 
+            // Translator Tabs
+            const translatorTabs = document.getElementById('translator-tabs');
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            // Image Tab Elements
+            const imageUpload = document.getElementById('image-upload');
+            const imagePreview = document.getElementById('image-preview');
+            const imageUploadPrompt = document.getElementById('image-upload-prompt');
+            const imageFromLang = document.getElementById('image-from-lang');
+            const imageToLang = document.getElementById('image-to-lang');
+            const translateImageBtn = document.getElementById('translate-image-btn');
+            const imageResultText = document.getElementById('image-result-text');
+
             // History
             const historyList = document.getElementById('history-list');
             const historySearch = document.getElementById('history-search');
@@ -408,6 +471,7 @@
                 largeText: false,
                 tempMode: false,
                 history: [],
+                uploadedImageFile: null,
             };
             let synthesis = window.speechSynthesis;
 
@@ -419,16 +483,21 @@
                 "bn": "Bengali", "el": "Greek", "nl": "Dutch", "sv": "Swedish", "tr": "Turkish"
             };
 
+            const tesseractLangMap = {
+                "en": "eng", "es": "spa", "fr": "fra", "de": "deu", "it": "ita",
+                "ja": "jpn", "ko": "kor", "pt": "por", "ru": "rus", "zh-CN": "chi_sim",
+                "ar": "ara", "hi": "hin", "bn": "ben", "el": "ell", "nl": "nld",
+                "sv": "swe", "tr": "tur"
+            };
+
             const helpArticles = {
                 translate: {
                     title: "Learning to Translate",
-                    content: `<p>Translating text is easy! Here's how:</p>
-                              <ol>
-                                <li><strong>Enter Text:</strong> Type the text you want to translate into the left-hand box.</li>
-                                <li><strong>Select Languages:</strong> Use the dropdown menus to select the original language and the language you want to translate it into.</li>
-                                <li><strong>View Translation:</strong> The translated text will appear automatically in the right-hand box as you type.</li>
-                                <li><strong>Listen Aloud:</strong> Click the speaker icon to hear the original or translated text read aloud.</li>
-                              </ol>`
+                    content: `<p>This translator offers multiple ways to translate content:</p>
+                              <ul>
+                                <li><b>Text Tab:</b> The default tab. Type text into the left box to see the translation on the right.</li>
+                                <li><b>Images Tab:</b> Upload an image containing text. The app will extract the text and translate it for you.</li>
+                              </ul>`
                 },
                 history: {
                     title: "Explaining History",
@@ -467,14 +536,15 @@
                 try {
                     const savedState = JSON.parse(localStorage.getItem('gamerytTranslatorState'));
                     if (savedState) {
-                        state = { ...state, ...savedState };
+                        state = { ...state, ...savedState, uploadedImageFile: null };
                     }
                 } catch (e) { console.error("Could not load state from localStorage", e); }
             };
 
             const saveState = () => {
                 try {
-                    localStorage.setItem('gamerytTranslatorState', JSON.stringify(state));
+                    const stateToSave = { ...state, uploadedImageFile: null };
+                    localStorage.setItem('gamerytTranslatorState', JSON.stringify(stateToSave));
                 } catch (e) { console.error("Could not save state to localStorage", e); }
             };
 
@@ -534,6 +604,7 @@
                 menuIcon.classList.toggle('hidden', width > 768);
                 if (width > 768) mobileSidebar.classList.add('hidden');
                 navItems.forEach(item => item.classList.toggle('nav-item-collapsed', width <= 1190));
+                tabButtons.forEach(button => button.classList.toggle('icon-only', width <= 992));
             };
 
             // --- TRANSLATION API ---
@@ -557,9 +628,13 @@
                 Object.entries(languages).forEach(([code, name]) => {
                     fromLang.add(new Option(name, code));
                     toLang.add(new Option(name, code));
+                    imageFromLang.add(new Option(name, code));
+                    imageToLang.add(new Option(name, code));
                 });
                 fromLang.value = 'en';
                 toLang.value = 'es';
+                imageFromLang.value = 'en';
+                imageToLang.value = 'es';
             };
             
             let translateTimeout;
@@ -654,6 +729,19 @@
                 closeSidebar.addEventListener('click', () => mobileSidebar.classList.add('hidden'));
                 mobileSidebar.addEventListener('click', (e) => { if (e.target === mobileSidebar) mobileSidebar.classList.add('hidden'); });
                 
+                translatorTabs.addEventListener('click', (e) => {
+                    const selectedTab = e.target.closest('.tab-button');
+                    if (!selectedTab) return;
+                    const tabName = selectedTab.dataset.tab;
+                    tabButtons.forEach(button => {
+                        button.classList.remove('text-purple-600', 'dark:text-purple-300', 'border-b-2', 'border-purple-500');
+                        button.classList.add('text-gray-500', 'dark:text-gray-400');
+                    });
+                    selectedTab.classList.add('text-purple-600', 'dark:text-purple-300', 'border-b-2', 'border-purple-500');
+                    selectedTab.classList.remove('text-gray-500', 'dark:text-gray-400');
+                    tabContents.forEach(content => content.classList.toggle('hidden', content.id !== `${tabName}-content`));
+                });
+
                 fromText.addEventListener('input', () => {
                     triggerTranslation();
                     const hasText = fromText.value.trim().length > 0;
@@ -675,6 +763,57 @@
                 });
                 closeHelpModal.addEventListener('click', () => helpModal.classList.add('hidden'));
                 helpModal.addEventListener('click', (e) => { if (e.target === helpModal) helpModal.classList.add('hidden'); });
+
+                imageUpload.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            imagePreview.src = event.target.result;
+                            imagePreview.classList.remove('hidden');
+                            imageUploadPrompt.classList.add('hidden');
+                            state.uploadedImageFile = file;
+                            translateImageBtn.disabled = false;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+                translateImageBtn.addEventListener('click', async () => {
+                    if (!state.uploadedImageFile) { showToast("Please upload an image first."); return; }
+                    translateImageBtn.disabled = true;
+                    const from = imageFromLang.value;
+                    const to = imageToLang.value;
+                    const tesseractLang = tesseractLangMap[from] || 'eng';
+
+                    try {
+                        imageResultText.textContent = "Initializing OCR engine...";
+                        const worker = await Tesseract.createWorker(tesseractLang, 1, {
+                            logger: m => {
+                                if (m.status === 'recognizing text') {
+                                    imageResultText.textContent = `Recognizing Text (${Math.round(m.progress * 100)}%)...`;
+                                }
+                            }
+                        });
+                        const { data: { text } } = await worker.recognize(state.uploadedImageFile);
+                        await worker.terminate();
+
+                        if (!text) {
+                            imageResultText.textContent = "Could not find any text in the image.";
+                            translateImageBtn.disabled = false;
+                            return;
+                        }
+
+                        imageResultText.textContent = "Translating extracted text...";
+                        const translatedText = await fetchCustomTranslation(text, from, to);
+                        imageResultText.textContent = translatedText;
+
+                    } catch (error) {
+                        console.error("Image translation process failed:", error);
+                        imageResultText.textContent = "An error occurred during image translation.";
+                    } finally {
+                        translateImageBtn.disabled = false;
+                    }
+                });
             };
 
             // --- RUN APP ---
