@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GAMERYT Translator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-      <link rel="icon" href="favicon.ico" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         /* Custom Scrollbar */
@@ -179,6 +178,14 @@
                                     <a href="https://gamerytdeveloper.github.io/GAMERYT-Calendar/" target="_blank" class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                                         <svg class="h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18M12 12.75h.008v.008H12v-.008z" /></svg>
                                         <span class="text-xs mt-1 text-center">GAMERYT Calendar</span>
+                                    </a>
+                                     <a href="https://gamerytdeveloper.github.io/GAMERYT-Tasks/" target="_blank" class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <svg class="h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        <span class="text-xs mt-1 text-center">GAMERYT Tasks</span>
+                                    </a>
+                                     <a href="https://gamerytdeveloper.github.io/GAMERYT-Tetris/" target="_blank" class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <svg class="h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+                                        <span class="text-xs mt-1 text-center">GAMERYT Tetris</span>
                                     </a>
                                 </div>
                             </div>
@@ -481,14 +488,15 @@
                 "en": "English", "es": "Spanish", "fr": "French", "de": "German",
                 "it": "Italian", "ja": "Japanese", "ko": "Korean", "pt": "Portuguese",
                 "ru": "Russian", "zh-CN": "Chinese", "ar": "Arabic", "hi": "Hindi",
-                "bn": "Bengali", "el": "Greek", "nl": "Dutch", "sv": "Swedish", "tr": "Turkish"
+                "bn": "Bengali", "el": "Greek", "nl": "Dutch", "sv": "Swedish", "tr": "Turkish",
+                "pl": "Polish", "uk": "Ukrainian", "id": "Indonesian"
             };
 
             const tesseractLangMap = {
                 "en": "eng", "es": "spa", "fr": "fra", "de": "deu", "it": "ita",
                 "ja": "jpn", "ko": "kor", "pt": "por", "ru": "rus", "zh-CN": "chi_sim",
                 "ar": "ara", "hi": "hin", "bn": "ben", "el": "ell", "nl": "nld",
-                "sv": "swe", "tr": "tur"
+                "sv": "swe", "tr": "tur", "pl": "pol", "uk": "ukr", "id": "ind"
             };
 
             const helpArticles = {
@@ -787,14 +795,8 @@
                     const tesseractLang = tesseractLangMap[from] || 'eng';
 
                     try {
-                        imageResultText.textContent = "Initializing OCR engine...";
-                        const worker = await Tesseract.createWorker(tesseractLang, 1, {
-                            logger: m => {
-                                if (m.status === 'recognizing text') {
-                                    imageResultText.textContent = `Recognizing Text (${Math.round(m.progress * 100)}%)...`;
-                                }
-                            }
-                        });
+                        imageResultText.textContent = "Processing Image... This may take a moment.";
+                        const worker = await Tesseract.createWorker(tesseractLang);
                         const { data: { text } } = await worker.recognize(state.uploadedImageFile);
                         await worker.terminate();
 
