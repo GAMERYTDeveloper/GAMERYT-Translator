@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAMERYT Translator</title> <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta name="description" content="GAMERYT Translator - A powerful and easy-to-use translator for text and images.">
+    <title>GAMERYT Translator</title>
+    <link rel="icon" type="image/x-icon" href="https://i.imgur.com/Sck1YjR.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
@@ -95,6 +97,11 @@
         }
         html.dark select {
              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='white' class='w-6 h-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9' /%3E%3C/svg%3E");
+        }
+        /* Fix for document text wrapping */
+        pre {
+            white-space: pre-wrap;
+            word-break: break-word;
         }
     </style>
     <script>
@@ -191,6 +198,10 @@
                                         <svg class="h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
                                         <span class="text-xs mt-1 text-center">GAMERYT Notes</span>
                                     </a>
+                                    <a href="https://gamerytdeveloper.github.io/GAMERYT-Weather/" target="_blank" class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <svg class="h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.5 4.5 0 002.25 15z" /></svg>
+                                        <span class="text-xs mt-1 text-center">GAMERYT Weather</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -257,6 +268,10 @@
                     <button data-tab="images" class="tab-button flex items-center py-2 px-4 text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300">
                         <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
                         <span class="tab-text ml-2">Images</span>
+                    </button>
+                     <button data-tab="documents" class="tab-button flex items-center py-2 px-4 text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                        <span class="tab-text ml-2">Documents</span>
                     </button>
                 </div>
 
@@ -329,6 +344,17 @@
                         <div id="image-result-container" class="mt-4 w-full bg-gray-50 dark:bg-gray-700 rounded-lg p-4 min-h-[100px] border border-gray-200 dark:border-gray-600">
                             <p id="image-result-text" class="text-gray-500 dark:text-gray-400">Translated text will appear here...</p>
                         </div>
+                    </div>
+                </div>
+                 <!-- Document Translation Content -->
+                <div id="documents-content" class="tab-content hidden">
+                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                        <h3 class="text-xl font-semibold mb-4">Document Translation</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Upload a .txt file. Its content will be loaded into the Text tab for translation.</p>
+                        <label for="doc-upload" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-4 rounded-lg cursor-pointer inline-block text-center">
+                            Upload .txt Document
+                        </label>
+                        <input type="file" id="doc-upload" accept=".txt" class="hidden">
                     </div>
                 </div>
             </div>
@@ -461,6 +487,9 @@
             const translateImageBtn = document.getElementById('translate-image-btn');
             const imageResultText = document.getElementById('image-result-text');
 
+             // Document Tab Elements
+            const docUpload = document.getElementById('doc-upload');
+
             // History
             const historyList = document.getElementById('history-list');
             const historySearch = document.getElementById('history-search');
@@ -493,14 +522,19 @@
                 "it": "Italian", "ja": "Japanese", "ko": "Korean", "pt": "Portuguese",
                 "ru": "Russian", "zh-CN": "Chinese", "ar": "Arabic", "hi": "Hindi",
                 "bn": "Bengali", "el": "Greek", "nl": "Dutch", "sv": "Swedish", "tr": "Turkish",
-                "pl": "Polish", "uk": "Ukrainian", "id": "Indonesian"
+                "pl": "Polish", "uk": "Ukrainian", "id": "Indonesian", "vi": "Vietnamese",
+                "th": "Thai", "he": "Hebrew", "cs": "Czech", "da": "Danish", "fi": "Finnish",
+                "hu": "Hungarian", "no": "Norwegian", "ro": "Romanian", "sk": "Slovak",
+                "fil": "Filipino", "ms": "Malay", "sw": "Swahili"
             };
 
             const tesseractLangMap = {
                 "en": "eng", "es": "spa", "fr": "fra", "de": "deu", "it": "ita",
                 "ja": "jpn", "ko": "kor", "pt": "por", "ru": "rus", "zh-CN": "chi_sim",
                 "ar": "ara", "hi": "hin", "bn": "ben", "el": "ell", "nl": "nld",
-                "sv": "swe", "tr": "tur", "pl": "pol", "uk": "ukr", "id": "ind"
+                "sv": "swe", "tr": "tur", "pl": "pol", "uk": "ukr", "id": "ind",
+                "vi": "vie", "th": "tha", "he": "heb", "cs": "ces", "da": "dan",
+                "fi": "fin", "hu": "hun", "no": "nor", "ro": "ron", "sk": "slk"
             };
 
             const helpArticles = {
@@ -510,6 +544,7 @@
                               <ul>
                                 <li><b>Text Tab:</b> The default tab. Type text into the left box to see the translation on the right.</li>
                                 <li><b>Images Tab:</b> Upload an image containing text. The app will extract the text and translate it for you.</li>
+                                <li><b>Documents Tab:</b> Upload a .txt file to see the original and translated text side-by-side.</li>
                               </ul>`
                 },
                 history: {
@@ -623,10 +658,17 @@
             // --- TRANSLATION API ---
             const fetchCustomTranslation = async (text, from, to) => {
                 if (!text) return "";
-                const langPair = `${from}|${to}`;
-                const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
+                const baseUrl = "https://api.mymemory.translated.net/get";
+                const params = new URLSearchParams({
+                    q: text,
+                    langpair: `${from}|${to}`
+                });
+                const apiUrl = `${baseUrl}?${params.toString()}`;
+                
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
+
                 try {
-                    const response = await fetch(apiUrl);
+                    const response = await fetch(proxyUrl);
                     if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
                     const data = await response.json();
                     return data?.responseData?.translatedText || "Translation not available.";
@@ -819,6 +861,34 @@
                         imageResultText.textContent = "An error occurred during image translation.";
                     } finally {
                         translateImageBtn.disabled = false;
+                    }
+                });
+
+                docUpload.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                     if (file && file.type === "text/plain") {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            fromText.value = event.target.result;
+                            // Switch to the text tab
+                            tabButtons.forEach(button => {
+                                const isTextTab = button.dataset.tab === 'text';
+                                button.classList.toggle('text-purple-600', isTextTab);
+                                button.classList.toggle('dark:text-purple-300', isTextTab);
+                                button.classList.toggle('border-b-2', isTextTab);
+                                button.classList.toggle('border-purple-500', isTextTab);
+                                button.classList.toggle('text-gray-500', !isTextTab);
+                                button.classList.toggle('dark:text-gray-400', !isTextTab);
+                            });
+                            tabContents.forEach(content => content.classList.toggle('hidden', content.id !== 'text-content'));
+                            
+                            // Trigger translation
+                            fromText.dispatchEvent(new Event('input'));
+                            showToast("Document content loaded for translation.");
+                        };
+                        reader.readAsText(file);
+                    } else if(file) {
+                        showToast("Please upload a valid .txt file.");
                     }
                 });
             };
