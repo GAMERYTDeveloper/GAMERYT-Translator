@@ -62,6 +62,18 @@
                 display: none;
             }
         }
+         /* Hides the apps icon on very small screens */
+        @media (max-width: 320px) {
+            #apps-button-wrapper {
+                display: none;
+            }
+        }
+        /* Hides clear history text on small screens */
+        @media (max-width: 768px) {
+            .clear-history-text {
+                display: none;
+            }
+        }
         /* Large Text Mode Styles */
         body.large-text-enabled {
             font-size: 1.125rem; /* Equivalent to text-lg */
@@ -98,11 +110,6 @@
         html.dark select {
              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='white' class='w-6 h-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9' /%3E%3C/svg%3E");
         }
-        /* Fix for document text wrapping */
-        pre {
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
     </style>
     <script>
         tailwind.config = {
@@ -134,8 +141,8 @@
     <div id="app-container" class="flex flex-col h-screen">
 
         <!-- Topbar -->
-        <header class="bg-white dark:bg-gray-800 shadow-md z-40">
-            <div class="container mx-auto px-4">
+        <header class="bg-white dark:bg-gray-800 shadow-md z-40 w-full">
+            <div class="px-4">
                 <div class="flex items-center justify-between h-16">
                     <!-- Left: Logo & Menu Icon -->
                     <div class="flex items-center space-x-4">
@@ -168,7 +175,7 @@
 
                     <!-- Right: Icons -->
                     <div class="flex items-center space-x-2">
-                        <div class="relative">
+                        <div id="apps-button-wrapper" class="relative">
                             <button id="apps-button" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
                                 <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
                             </button>
@@ -256,7 +263,7 @@
 
 
         <!-- Main Content -->
-        <main class="flex-grow container mx-auto p-4 overflow-y-auto">
+        <main class="flex-grow w-full p-4 overflow-y-auto">
             <!-- Translate View -->
             <div id="translate-view">
                 <!-- Translator Tabs -->
@@ -268,10 +275,6 @@
                     <button data-tab="images" class="tab-button flex items-center py-2 px-4 text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300">
                         <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
                         <span class="tab-text ml-2">Images</span>
-                    </button>
-                     <button data-tab="documents" class="tab-button flex items-center py-2 px-4 text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300">
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
-                        <span class="tab-text ml-2">Documents</span>
                     </button>
                 </div>
 
@@ -287,6 +290,9 @@
                                 <div class="space-x-1">
                                     <button id="speak-from" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
                                         <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                                    </button>
+                                    <button id="mic-input" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19 10v2a7 7 0 01-14 0v-2" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 19v2" /><path stroke-linecap="round" stroke-linejoin="round" d="M8 21h8" /></svg>
                                     </button>
                                 </div>
                                 <button id="copy-from" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
@@ -346,22 +352,17 @@
                         </div>
                     </div>
                 </div>
-                 <!-- Document Translation Content -->
-                <div id="documents-content" class="tab-content hidden">
-                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                        <h3 class="text-xl font-semibold mb-4">Document Translation</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Upload a .txt file. Its content will be loaded into the Text tab for translation.</p>
-                        <label for="doc-upload" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-4 rounded-lg cursor-pointer inline-block text-center">
-                            Upload .txt Document
-                        </label>
-                        <input type="file" id="doc-upload" accept=".txt" class="hidden">
-                    </div>
-                </div>
             </div>
 
             <!-- History View -->
             <div id="history-view" class="hidden">
-                 <h2 class="text-2xl font-bold mb-4">Translation History</h2>
+                 <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Translation History</h2>
+                    <button id="clear-history-btn" class="flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                        <span class="clear-history-text ml-2">Clear History</span>
+                    </button>
+                 </div>
                  <div class="mb-4">
                     <input type="text" id="history-search" class="w-full p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg" placeholder="Search history...">
                  </div>
@@ -459,6 +460,7 @@
             const speakToBtn = document.getElementById('speak-to');
             const copyFromBtn = document.getElementById('copy-from');
             const copyToBtn = document.getElementById('copy-to');
+            const micInput = document.getElementById('mic-input');
 
             const toast = document.getElementById('toast');
 
@@ -487,12 +489,10 @@
             const translateImageBtn = document.getElementById('translate-image-btn');
             const imageResultText = document.getElementById('image-result-text');
 
-             // Document Tab Elements
-            const docUpload = document.getElementById('doc-upload');
-
             // History
             const historyList = document.getElementById('history-list');
             const historySearch = document.getElementById('history-search');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
 
             // Settings
             const darkModeToggle = document.getElementById('dark-mode-toggle');
@@ -515,6 +515,8 @@
                 uploadedImageFile: null,
             };
             let synthesis = window.speechSynthesis;
+            let recognition;
+            let isRecognizing = false;
 
             // --- DATA ---
             const languages = {
@@ -544,7 +546,6 @@
                               <ul>
                                 <li><b>Text Tab:</b> The default tab. Type text into the left box to see the translation on the right.</li>
                                 <li><b>Images Tab:</b> Upload an image containing text. The app will extract the text and translate it for you.</li>
-                                <li><b>Documents Tab:</b> Upload a .txt file to see the original and translated text side-by-side.</li>
                               </ul>`
                 },
                 history: {
@@ -759,6 +760,29 @@
                 synthesis.speak(utterance);
             };
 
+            const setupSpeechRecognition = () => {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) { showToast('Speech recognition not supported.'); micInput.disabled = true; return; }
+                recognition = new SpeechRecognition();
+                recognition.continuous = false; recognition.lang = fromLang.value;
+                recognition.interimResults = false; recognition.maxAlternatives = 1;
+                recognition.onstart = () => { isRecognizing = true; micInput.classList.add('text-red-500', 'animate-pulse'); };
+                recognition.onresult = (event) => {
+                    fromText.value = event.results[0][0].transcript;
+                    fromText.dispatchEvent(new Event('input'));
+                };
+                recognition.onerror = (event) => { if (event.error !== 'no-speech' && event.error !== 'aborted') showToast(`Recognition error: ${event.error}`); };
+                recognition.onend = () => { isRecognizing = false; micInput.classList.remove('text-red-500', 'animate-pulse'); };
+            };
+            const handleMicInput = () => {
+                if (!recognition) { setupSpeechRecognition(); if (!recognition) return; }
+                if (isRecognizing) { recognition.stop(); return; }
+                navigator.mediaDevices.getUserMedia({ audio: true }).then(() => {
+                    recognition.lang = fromLang.value;
+                    recognition.start();
+                }).catch(() => showToast('Microphone permission denied.'));
+            };
+
             // --- HELP MODAL LOGIC ---
             const openHelpModal = (topic) => {
                 const article = helpArticles[topic];
@@ -808,8 +832,15 @@
                 copyToBtn.addEventListener('click', () => { navigator.clipboard.writeText(toText.textContent).then(() => showToast('Translated text copied!')); });
                 speakFromBtn.addEventListener('click', () => speakText(fromText.value, fromLang.value));
                 speakToBtn.addEventListener('click', () => speakText(toText.textContent, toLang.value));
+                micInput.addEventListener('click', handleMicInput);
                 historySearch.addEventListener('input', () => renderHistory(historySearch.value));
                 navLinks.history.addEventListener('click', () => renderHistory(historySearch.value));
+                clearHistoryBtn.addEventListener('click', () => {
+                    state.history = [];
+                    saveState();
+                    renderHistory();
+                    showToast("History cleared.");
+                });
                 darkModeToggle.addEventListener('click', () => { state.darkMode = !state.darkMode; saveState(); applySettings(); });
                 largeTextToggle.addEventListener('click', () => { state.largeText = !state.largeText; saveState(); applySettings(); });
                 tempModeToggle.addEventListener('click', () => { state.tempMode = !state.tempMode; saveState(); applySettings(); });
@@ -861,34 +892,6 @@
                         imageResultText.textContent = "An error occurred during image translation.";
                     } finally {
                         translateImageBtn.disabled = false;
-                    }
-                });
-
-                docUpload.addEventListener('change', (e) => {
-                    const file = e.target.files[0];
-                     if (file && file.type === "text/plain") {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            fromText.value = event.target.result;
-                            // Switch to the text tab
-                            tabButtons.forEach(button => {
-                                const isTextTab = button.dataset.tab === 'text';
-                                button.classList.toggle('text-purple-600', isTextTab);
-                                button.classList.toggle('dark:text-purple-300', isTextTab);
-                                button.classList.toggle('border-b-2', isTextTab);
-                                button.classList.toggle('border-purple-500', isTextTab);
-                                button.classList.toggle('text-gray-500', !isTextTab);
-                                button.classList.toggle('dark:text-gray-400', !isTextTab);
-                            });
-                            tabContents.forEach(content => content.classList.toggle('hidden', content.id !== 'text-content'));
-                            
-                            // Trigger translation
-                            fromText.dispatchEvent(new Event('input'));
-                            showToast("Document content loaded for translation.");
-                        };
-                        reader.readAsText(file);
-                    } else if(file) {
-                        showToast("Please upload a valid .txt file.");
                     }
                 });
             };
