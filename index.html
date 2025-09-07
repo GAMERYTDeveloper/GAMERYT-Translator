@@ -280,7 +280,6 @@
 
                 <!-- Text Translation Content -->
                 <div id="text-content" class="tab-content">
-                    <h1 class="text-white">GAMERYT Translator is Temporarily unavailable.</h1>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col">
                             <div class="flex items-center justify-between mb-2">
@@ -660,7 +659,7 @@
             // --- TRANSLATION API ---
             const fetchCustomTranslation = async (text, from, to) => {
                 if (!text) return "";
-                const baseUrl = "";
+                const baseUrl = "https://api.mymemory.translated.net/get";
                 const params = new URLSearchParams({
                     q: text,
                     langpair: `${from}|${to}`
@@ -676,7 +675,7 @@
                     return data?.responseData?.translatedText || "Translation not available.";
                 } catch (error) {
                     console.error('Translation API error:', error);
-                    return "Translation is temporarily unavailable.";
+                    return "Translation failed.";
                 }
             };
 
@@ -890,7 +889,7 @@
 
                     } catch (error) {
                         console.error("Image translation process failed:", error);
-                        imageResultText.textContent = "An error occurred during i.";
+                        imageResultText.textContent = "An error occurred during image translation.";
                     } finally {
                         translateImageBtn.disabled = false;
                     }
